@@ -25,15 +25,19 @@ end
 
 
 def save_and_get_deps(path, name, project)
-  puts name
-  f = open("#{path}/#{name}")
+  begin
+    f = open("#{path}/_#{name}")
+  rescue
+    f = open("#{path}/#{name}")
+  end
+    
   content = f.read
   open("#{project}/#{name}", "w") do |f|
     f.puts(content)
     f.close
   end
   # return dependencies
-  content.scan(/@import "(.*?)"/).flatten.select {|e| !e.match("compass/") }.map {|f| "_#{f}"}
+  content.scan(/@import "(.*?)"/).flatten.select {|e| !e.match("compass/") }
 end
 
 get '/compile/:project' do |project|

@@ -17,12 +17,12 @@ Deploy it and you can access compile files by accessing
 ```
 
 Where:
-* url: where you deployed your SASSaaS instance
-* namespace: the namespace for your project. SASSaaS will download the files and keep them saved for you in your namespace folder
-* url for the file: where the file is
+* **url**: where you deployed your SASSaaS instance
+* **namespace**: the namespace for your project. SASSaaS will download the files and keep them saved for you in your namespace folder
+* **url for the file**: where the file is
 
 ## Try it!
 ```
-curl sassaas.herokuapp.com/compile/<your namespace>?file=<your file>
+curl sassaas.herokuapp.com/compile/<your namespace>?file=<url for your file>
 ```
 

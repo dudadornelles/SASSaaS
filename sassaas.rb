@@ -4,53 +4,30 @@ require 'open-uri'
 require 'net/http'
 require 'fileutils'
 require 'compass'
+require './lib/dependencies'
+require './lib/path'
 
 configure do
   Compass.configuration do |config|
     config.project_path = File.dirname(__FILE__)
   end
 
-  set :haml, { :format => :html5 }
   set :sass, Compass.sass_engine_options
   set :scss, Compass.sass_engine_options
   set :port, 80
 end
 
-
-def download_deps_of(path, name, project)
-  deps = save_and_get_deps(path, name, project)
-  unless deps.empty?
-    deps.each {|dep| download_deps_of(path, dep, project) }
-  end
-end
-
-
-def save_and_get_deps(path, name, project)
-  return if File.exists?("#{path}/#{name}")
-
-  begin
-    f = open("#{path}/_#{name}")
-  rescue
-    f = open("#{path}/#{name}")
-  end
-
-  content = f.read
-  open("#{project}/#{name}", "w") do |f|
-    f.puts(content)
-    f.close
-  end
-  # return dependencies
-  content.scan(/@import "(.*?)"/).flatten.select {|e| !e.match("compass/") }
-end
-
-get '/compile/:project' do |project|
-  project_folder = "views/#{project}"
-  url = request[:file]
-  name = File.basename(url)
-  path = File.dirname(url)
+get '/compile' do
+  file_url_dir, folder_path, main_filename = url_parts(request[:f])
+  project_folder = File.join('views', folder_path)
   FileUtils.mkdir_p(project_folder)
-  filetype = name.match(/\.sass$/) ? :sass : :scss
 
-  download_deps_of(path, name, project_folder) if !File.exists?("#{project_folder}/#{name}")
-  self.send(filetype, "#{project}/#{name.gsub(/\.scss/,'')}".to_sym)
+  # XXX: better check for filetype and return 422 in case it isnt sass or scss
+  filetype = main_filename.match(/\.sass$/) ? :sass : :scss
+ 
+  download_deps_of(file_url_dir, main_filename, project_folder) unless File.exists?(File.join(folder_path, main_filename))
+
+  to_render = File.join(folder_path, File.basename(main_filename, '.*')).to_sym
+  self.send(filetype, to_render)
 end
+

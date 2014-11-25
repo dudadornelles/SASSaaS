@@ -1,6 +1,7 @@
 require 'sass'
 require 'sinatra'
 require 'open-uri'
+require 'net/http'
 require 'fileutils'
 require 'compass'
 
@@ -25,12 +26,14 @@ end
 
 
 def save_and_get_deps(path, name, project)
+  return if File.exists?("#{path}/#{name}")
+
   begin
     f = open("#{path}/_#{name}")
   rescue
     f = open("#{path}/#{name}")
   end
-    
+
   content = f.read
   open("#{project}/#{name}", "w") do |f|
     f.puts(content)
@@ -41,15 +44,13 @@ def save_and_get_deps(path, name, project)
 end
 
 get '/compile/:project' do |project|
-  old_project = project
-  project = "views/#{project}"
-
-  FileUtils.mkdir_p(project)
-
+  project_folder = "views/#{project}"
   url = request[:file]
   name = File.basename(url)
   path = File.dirname(url)
-  download_deps_of(path, name, project)
+  FileUtils.mkdir_p(project_folder)
+  filetype = name.match(/\.sass$/) ? :sass : :scss
 
-  scss "#{old_project}/#{name.gsub(/\.scss/,'')}".to_sym
+  download_deps_of(path, name, project_folder) if !File.exists?("#{project_folder}/#{name}")
+  self.send(filetype, "#{project}/#{name.gsub(/\.scss/,'')}".to_sym)
 end

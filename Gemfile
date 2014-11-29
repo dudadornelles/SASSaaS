@@ -5,3 +5,4 @@ gem 'sinatra'
 gem 'compass'
 
 gem 'byebug'
+gem 'shotgun'

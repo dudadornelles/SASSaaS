@@ -20,12 +20,15 @@ end
 get '/compile' do
   file_url_dir, folder_path, main_filename = url_parts(request[:f])
   project_folder = File.join('views', folder_path)
-  FileUtils.mkdir_p(project_folder)
 
   # XXX: better check for filetype and return 422 in case it isnt sass or scss
   filetype = main_filename.match(/\.sass$/) ? :sass : :scss
- 
-  download_deps_of(file_url_dir, main_filename, project_folder) unless File.exists?(File.join(folder_path, main_filename))
+
+  uri = URI.parse(request[:f])
+  http = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https')
+  remote_dir = File.dirname(uri.path)
+
+  download_deps_of(remote_dir, main_filename, project_folder, filetype.to_s, http) unless File.exists?(File.join(folder_path, main_filename))
 
   to_render = File.join(folder_path, File.basename(main_filename, '.*')).to_sym
   self.send(filetype, to_render)

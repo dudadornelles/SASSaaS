@@ -26,25 +26,27 @@
 <p>A service that given a url with a SASS file returns the compiled CSS</p>
 
 <h2>
+<a id="try-it" class="anchor" href="#try-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>Try it!</h2>
+
+<pre><code>// compile bootstrap.scss
+curl sassaas.herokuapp.com/compile?file=https://raw.githubusercontent.com/twbs/bootstrap-sass/master/assets/stylesheets/_bootstrap.scss
+</code></pre>
+
+<h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features:</h2>
 
 <ul>
-<li>It supports <strong>'@import'</strong> given the required files are in the same path, e.g:
-
-<ul>
-<li>If you have a file in <strong>'localhost/scss/main.scss'</strong> you will be able to <strong>@import</strong> any scss file into main.scss as long as these files are also located in <strong>'localhost/scss/'</strong>
-</li>
-</ul>
-</li>
+<li>You can '@import' other files in your folder structure</li>
 <li>It supports compass</li>
+<li>It caches the scss files for faster compilation, but it allows one to clean the cache with a simple url param</li>
 </ul>
 
 <h2>
 <a id="how-to" class="anchor" href="#how-to" aria-hidden="true"><span class="octicon octicon-link"></span></a>How-to</h2>
 
-<p>Deploy it and you can access compile files by accessing</p>
+<p>Deploy it and you can access files by accessing</p>
 
-<pre><code>&lt;url&gt;/compile?f=&lt;url for the file&gt;
+<pre><code>&lt;url&gt;/compile?f=&lt;url for the file&gt;&amp;clean=&lt;true|false&gt;
 </code></pre>
 
 <p>Where:</p>
@@ -54,13 +56,11 @@
 <strong>url</strong>: where you deployed your SASSaaS instance</li>
 <li>
 <strong>url for the file</strong>: where the file is</li>
+<li>
+        <strong>clean</strong>: send 'clean=true' if you want to clean the cache</li>
 </ul>
 
-<h2>
-<a id="try-it" class="anchor" href="#try-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>Try it!</h2>
 
-<pre><code>curl sassaas.herokuapp.com/compile?file=&lt;url for your file&gt;
-</code></pre>
       </section>
     </div>
 

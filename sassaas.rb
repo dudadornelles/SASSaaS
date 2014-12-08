@@ -1,11 +1,8 @@
 require 'sass'
 require 'sinatra'
-require 'open-uri'
-require 'net/http'
-require 'fileutils'
 require 'compass'
-require './lib/dependencies'
-require './lib/path'
+require './lib/sass_file'
+require './lib/http_client'
 
 configure do
   Compass.configuration do |config|
@@ -18,19 +15,9 @@ configure do
 end
 
 get '/compile' do
-  file_url_dir, folder_path, main_filename = url_parts(request[:f])
-  project_folder = File.join('views', folder_path)
+  http = HttpClient.new(request[:f])
+  sass_file = SassFile.new(request[:f], http)
 
-  # XXX: better check for filetype and return 422 in case it isnt sass or scss
-  filetype = main_filename.match(/\.sass$/) ? :sass : :scss
-
-  uri = URI.parse(request[:f])
-  http = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https')
-  remote_dir = File.dirname(uri.path)
-
-  download_deps_of(remote_dir, main_filename, project_folder, filetype.to_s, http) unless File.exists?(File.join(folder_path, main_filename))
-
-  to_render = File.join(folder_path, File.basename(main_filename, '.*')).to_sym
-  self.send(filetype, to_render)
+  self.send(sass_file.filetype, sass_file.to_render_path)
 end
 

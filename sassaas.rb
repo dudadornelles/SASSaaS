@@ -16,7 +16,8 @@ end
 
 get '/compile' do
   http = HttpClient.new(request[:f])
-  sass_file = SassFile.new(request[:f], http)
+  clean_cache =  request[:clean] || false
+  sass_file = SassFile.new(request[:f], http, clean_cache)
 
   self.send(sass_file.filetype, sass_file.to_render_path)
 end
